@@ -1,0 +1,67 @@
+/* ─── Global reset & base for YatraVerse ─── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --brand:        #C0522A;
+  --brand-light:  rgba(192, 82, 42, 0.08);
+  --text:         #374151;
+  --text-muted:   #6B7280;
+  --heading:      #111827;
+  --bg:           #ffffff;
+  --bg-subtle:    #F9F7F5;
+  --border:       #E5E0DA;
+  --shadow-sm:    0 1px 4px rgba(0,0,0,0.06);
+  --shadow-md:    0 4px 16px rgba(0,0,0,0.10);
+  --radius:       10px;
+  --radius-sm:    6px;
+
+  font-family: 'Inter', system-ui, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+h1, h2, h3 {
+  color: var(--heading);
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0 0 0.5em;
+}
+
+p {
+  margin: 0 0 1em;
+}
+
+a {
+  color: var(--brand);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
