@@ -1,0 +1,108 @@
+/* ======================================================
+   Navbar.css — matches home.png design exactly
+   Brand color: #C0522A (terracotta orange)
+   ====================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ── Container ── */
+.navbar {
+  width: 100%;
+  background: #ffffff;
+  border-bottom: 1px solid #eeebe8;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.navbar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+  height: 60px;
+  box-sizing: border-box;
+}
+
+/* ── Brand (left) ── */
+.navbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+/* Scale the logo image down — it's a large PNG, show just the icon part */
+.navbar__logo-img {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  object-position: center 30%;   /* crop to show the sun/wave icon, not the text */
+  border-radius: 2px;
+}
+
+.navbar__title {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #C0522A;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* ── Nav links (right side in home.png) ── */
+.navbar__nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.navbar__link {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #374151;
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  position: relative;
+  transition: color 0.18s, background 0.18s;
+  white-space: nowrap;
+}
+
+.navbar__link:hover {
+  color: #C0522A;
+  background: rgba(192, 82, 42, 0.06);
+}
+
+/* Active state — orange underline like in home.png */
+.navbar__link--active {
+  color: #C0522A;
+  font-weight: 600;
+}
+
+.navbar__link--active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;           /* sits just on the navbar border */
+  left: 14px;
+  right: 14px;
+  height: 2px;
+  background: #C0522A;
+  border-radius: 2px 2px 0 0;
+}
+
+/* ── Mobile (collapse nav) ── */
+@media (max-width: 600px) {
+  .navbar__inner {
+    padding: 0 16px;
+  }
+
+  .navbar__link {
+    padding: 6px 10px;
+    font-size: 0.88rem;
+  }
+}
