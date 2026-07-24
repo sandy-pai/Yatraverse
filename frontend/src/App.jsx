@@ -1,10 +1,14 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import PlaceDetails from './pages/PlaceDetails';
 import Admin from './pages/Admin';
 import AddPlace from './pages/AddPlace';
 import EditPlace from './pages/EditPlace';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
 import './App.css';
 
 function NotFound() {
@@ -17,16 +21,41 @@ function NotFound() {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Navbar />
-      <Routes>
-        <Route path="/"            element={<Home />} />
-        <Route path="/places/:id"  element={<PlaceDetails />} />
-        <Route path="/admin"       element={<Admin />} />
-        <Route path="/admin/add"   element={<AddPlace />} />
-        <Route path="/admin/edit/:id" element={<EditPlace />} />
-        <Route path="*"            element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/places/:id" element={<PlaceDetails />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute adminOnly>
+                <Admin />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/add"
+            element={
+              <ProtectedRoute adminOnly>
+                <AddPlace />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/edit/:id"
+            element={
+              <ProtectedRoute adminOnly>
+                <EditPlace />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
