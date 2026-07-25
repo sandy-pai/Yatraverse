@@ -6,6 +6,7 @@ import MongoStore from 'connect-mongo';
 import connectDB from './config/db.js';
 import placeRoutes from './routes/placeRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import wishlistRoutes from './routes/wishlistRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
 dotenv.config();
@@ -16,6 +17,9 @@ const app = express();
 connectDB();
 
 // Middleware
+// Trust the reverse proxy (e.g., Vercel/Heroku/Render) so secure cookies can be set
+app.set('trust proxy', 1);
+
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:5173',
@@ -46,6 +50,7 @@ app.use(
 // Routes
 app.use('/api/places', placeRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

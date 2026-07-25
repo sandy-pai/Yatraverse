@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api';
+import { useAuth } from '../context/AuthContext';
 
 export default function PlaceDetails() {
   const { id }    = useParams();
@@ -10,6 +11,29 @@ export default function PlaceDetails() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [error,   setError]   = useState('');
+  
+  const { isAuthenticated, user } = useAuth();
+  const [isWishlisted, setIsWishlisted] = useState(false);
+
+  useEffect(() => {
+    if (user?.wishlist?.includes(id)) {
+      setIsWishlisted(true);
+    }
+  }, [user, id]);
+
+  const toggleWishlist = async () => {
+    try {
+      if (isWishlisted) {
+        await api.delete(`/wishlist/${id}`);
+        setIsWishlisted(false);
+      } else {
+        await api.post(`/wishlist/${id}`);
+        setIsWishlisted(true);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   // ── Fetch ────────────────────────────────────────────────────────
   useEffect(() => {
@@ -87,7 +111,8 @@ export default function PlaceDetails() {
     state,
     city,
     image,
-    rating,
+    averageRating = 0,
+    ratings = [],
     bestTime,
     entryFee,
     description,
@@ -136,6 +161,17 @@ export default function PlaceDetails() {
           >
             <ShareIcon />
           </button>
+          
+          {isAuthenticated && (
+            <button
+              className="pd__fab"
+              aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+              onClick={toggleWishlist}
+              style={{ color: isWishlisted ? '#ef4444' : 'currentColor' }}
+            >
+              <HeartIcon filled={isWishlisted} />
+            </button>
+          )}
         </div>
       </div>
 
@@ -162,7 +198,7 @@ export default function PlaceDetails() {
                 )}
                 <span className="pd__rating">
                   <span className="pd__star">★</span>
-                  {Number(rating).toFixed(1)}
+                  {Number(averageRating).toFixed(1)}
                 </span>
               </div>
             </div>
@@ -181,8 +217,48 @@ export default function PlaceDetails() {
             <DetailRow icon={<LocationIcon />} label="Location"       value={location} />
             <DetailRow icon={<TimeIcon />}     label="Best Time"      value={bestTime} />
             <DetailRow icon={<TicketIcon />}   label="Entry Fee"      value={`₹${entryFee}`} />
-            <DetailRow icon={<StarIcon />}     label="Rating"         value={`${Number(rating).toFixed(1)} ⭐`} />
+            <DetailRow icon={<StarIcon />}     label="Rating"         value={`${Number(averageRating).toFixed(1)} ⭐`} />
           </section>
+
+          {/* Interactive Rating for Logged-in Users */}
+          {isAuthenticated && (
+            <section className="pd__rate-section" aria-labelledby="rate-heading" style={{ marginTop: '2rem', padding: '1.5rem', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+              <h2 id="rate-heading" className="pd__about-title" style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>Rate this place</h2>
+              <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '1rem' }}>Click a star to submit your rating.</p>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                {[1, 2, 3, 4, 5].map(val => {
+                  // user._id or user.id depending on what backend returns for session user, default to user._id
+                  const userId = user?._id || user?.id;
+                  const currentVal = ratings?.find(r => r.user === userId)?.value || 0;
+                  return (
+                    <button
+                      key={val}
+                      onClick={async () => {
+                        try {
+                          await api.post(`/places/${id}/rate`, { value: val });
+                          const { data } = await api.get(`/places/${id}`);
+                          setPlace(data);
+                        } catch (err) {
+                          console.error(err);
+                          alert('Failed to submit rating');
+                        }
+                      }}
+                      style={{
+                        background: 'none', border: 'none', cursor: 'pointer', fontSize: '2rem',
+                        color: currentVal >= val ? '#fbbf24' : '#cbd5e1',
+                        transition: 'transform 0.2s', padding: 0,
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
+                      onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                      aria-label={`Rate ${val} stars`}
+                    >
+                      ★
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          )}
         </div>
 
         {/* ── Right column ── */}
@@ -363,6 +439,23 @@ function StarIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+    </svg>
+  );
+}
+
+function HeartIcon({ filled }) {
+  return (
+    <svg 
+      viewBox="0 0 24 24" 
+      fill={filled ? "currentColor" : "none"} 
+      stroke="currentColor" 
+      strokeWidth="2"
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      width="20" 
+      height="20"
+    >
+      <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
     </svg>
   );
 }

@@ -1,4 +1,7 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import api from '../api';
 
 /**
  * PlaceCard — reusable card for a tourist place.
@@ -19,12 +22,36 @@ export default function PlaceCard({ place, variant = 'grid' }) {
     name,
     state,
     image,
-    rating,
+    averageRating,
     bestTime,
     description,
   } = place;
 
+  const { isAuthenticated, user } = useAuth();
+  const [isWishlisted, setIsWishlisted] = useState(false);
+
+  useEffect(() => {
+    if (user?.wishlist?.includes(_id)) {
+      setIsWishlisted(true);
+    }
+  }, [user, _id]);
+
   const handleClick = () => navigate(`/places/${_id}`);
+
+  const toggleWishlist = async (e) => {
+    e.stopPropagation();
+    try {
+      if (isWishlisted) {
+        await api.delete(`/wishlist/${_id}`);
+        setIsWishlisted(false);
+      } else {
+        await api.post(`/wishlist/${_id}`);
+        setIsWishlisted(true);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   // ── Render star rating ──────────────────────────────────────────
   const renderStars = (value) => {
@@ -66,8 +93,33 @@ export default function PlaceCard({ place, variant = 'grid' }) {
           {/* Rating pill overlay — top-left */}
           <span className="placecard__rating-overlay">
             <span className="placecard__star-icon">★</span>
-            {Number(rating).toFixed(1)}
+            {Number(averageRating).toFixed(1)}
           </span>
+          {isAuthenticated && (
+            <button 
+              className="placecard__wishlist-btn" 
+              onClick={toggleWishlist}
+              aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+              style={{
+                position: 'absolute',
+                top: '12px',
+                right: '12px',
+                background: 'rgba(255, 255, 255, 0.9)',
+                border: 'none',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                color: isWishlisted ? '#ef4444' : '#64748b'
+              }}
+            >
+              <HeartIcon filled={isWishlisted} />
+            </button>
+          )}
         </div>
 
         {/* Card body */}
@@ -114,6 +166,31 @@ export default function PlaceCard({ place, variant = 'grid' }) {
               'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=600&q=80';
           }}
         />
+        {isAuthenticated && (
+          <button 
+            className="placecard__wishlist-btn" 
+            onClick={toggleWishlist}
+            aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+            style={{
+              position: 'absolute',
+              top: '12px',
+              right: '12px',
+              background: 'rgba(255, 255, 255, 0.9)',
+              border: 'none',
+              borderRadius: '50%',
+              width: '32px',
+              height: '32px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              color: isWishlisted ? '#ef4444' : '#64748b'
+            }}
+          >
+            <HeartIcon filled={isWishlisted} />
+          </button>
+        )}
       </div>
 
       {/* Card body */}
@@ -123,7 +200,7 @@ export default function PlaceCard({ place, variant = 'grid' }) {
           <h3 className="placecard__name">{name}</h3>
           <span className="placecard__rating">
             <span className="placecard__star-icon">★</span>
-            {Number(rating).toFixed(1)}
+            {Number(averageRating).toFixed(1)}
           </span>
         </div>
 
@@ -156,6 +233,23 @@ function CalendarIcon() {
       <rect x="1" y="3" width="14" height="12" rx="2" stroke="currentColor" strokeWidth="1.4"/>
       <path d="M1 7h14" stroke="currentColor" strokeWidth="1.4"/>
       <path d="M5 1v4M11 1v4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+    </svg>
+  );
+}
+
+function HeartIcon({ filled }) {
+  return (
+    <svg 
+      viewBox="0 0 24 24" 
+      fill={filled ? "currentColor" : "none"} 
+      stroke="currentColor" 
+      strokeWidth="2"
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      width="18" 
+      height="18"
+    >
+      <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
     </svg>
   );
 }

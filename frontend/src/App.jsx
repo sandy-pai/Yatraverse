@@ -9,6 +9,7 @@ import AddPlace from './pages/AddPlace';
 import EditPlace from './pages/EditPlace';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Wishlist from './pages/Wishlist';
 import './App.css';
 
 function NotFound() {
@@ -29,6 +30,14 @@ export default function App() {
           <Route path="/places/:id" element={<PlaceDetails />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route
+            path="/wishlist"
+            element={
+              <ProtectedRoute>
+                <Wishlist />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/admin"
             element={

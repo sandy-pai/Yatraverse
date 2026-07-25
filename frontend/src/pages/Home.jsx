@@ -39,7 +39,7 @@ export default function Home() {
         const { data } = await api.get('/places');
         const all = Array.isArray(data) ? data : [];
         // Top Rated: sort by rating desc, take top 4
-        const sorted = [...all].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        const sorted = [...all].sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
         setTopRated(sorted.slice(0, 4));
         setPlaces(all);
         setTotalCount(all.length);
@@ -174,7 +174,7 @@ export default function Home() {
               <button
                 className="home__view-all"
                 onClick={() => {
-                  const sorted = [...places].sort((a, b) => b.rating - a.rating);
+                  const sorted = [...places].sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
                   setPlaces(sorted);
                   setIsFiltered(true);
                   setVisibleCount(PAGE_SIZE);

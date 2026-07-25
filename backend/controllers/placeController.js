@@ -6,6 +6,7 @@ import Place from '../models/Place.js';
 export const getPlaces = async (req, res) => {
   try {
     const { search, state } = req.query;
+  // We will sort by averageRating after fetching
     const query = {};
 
     if (search) {
@@ -52,13 +53,17 @@ export const createPlace = async (req, res) => {
       name,
       state,
       city,
-      image,
       description,
       bestTime,
       entryFee,
-      rating,
       location,
     } = req.body;
+
+    // Prefer an uploaded file (converted to Base64 data URI); fall back to a
+    // plain URL string submitted in the request body.
+    const image = req.file
+      ? `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`
+      : req.body.image;
 
     const place = await Place.create({
       name,
@@ -68,7 +73,6 @@ export const createPlace = async (req, res) => {
       description,
       bestTime,
       entryFee,
-      rating,
       location,
     });
 
@@ -91,7 +95,6 @@ export const updatePlace = async (req, res) => {
       name,
       state,
       city,
-      image,
       description,
       bestTime,
       entryFee,
@@ -105,14 +108,23 @@ export const updatePlace = async (req, res) => {
       return res.status(404).json({ message: 'Tourist Place Not Found' });
     }
 
+    // Resolve image: uploaded file → Base64 data URI, body string → URL,
+    // nothing provided → keep the existing stored value.
+    let image = place.image;
+    if (req.file) {
+      image = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+    } else if (req.body.image) {
+      image = req.body.image;
+    }
+
     place.name = name || place.name;
     place.state = state || place.state;
     place.city = city || place.city;
-    place.image = image || place.image;
+    place.image = image;
     place.description = description || place.description;
     place.bestTime = bestTime || place.bestTime;
     place.entryFee = entryFee !== undefined ? entryFee : place.entryFee;
-    place.rating = rating !== undefined ? rating : place.rating;
+    // rating field removed; keep existing ratings array unchanged
     place.location = location || place.location;
 
     const updatedPlace = await place.save();

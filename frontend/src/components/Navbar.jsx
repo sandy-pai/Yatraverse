@@ -45,6 +45,14 @@ export default function Navbar() {
 
           {isAuthenticated ? (
             <>
+              <NavLink
+                to="/wishlist"
+                className={({ isActive }) =>
+                  isActive ? 'navbar__link navbar__link--active' : 'navbar__link'
+                }
+              >
+                Wishlist
+              </NavLink>
               {user?.role === 'admin' && (
                 <NavLink
                   to="/admin"
