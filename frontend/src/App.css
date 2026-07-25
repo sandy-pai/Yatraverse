@@ -320,7 +320,7 @@
   flex-direction: column;
   background-image:
     linear-gradient(to bottom, rgba(255, 255, 255, 0.3), rgba(255, 138, 4, 0.8)),
-    url('durga-pupa-frame-13_230402-375.avif');
+    url('durga-pupa-frame-13_230402-375.png');
 }
 
 .home__hero {
@@ -334,7 +334,7 @@
   font-family: 'Inter', system-ui, sans-serif;
   font-size: clamp(1.8rem, 4vw, 2.6rem);
   font-weight: 800;
-  color: #ffffff;
+  color: #000000;
   margin: 0 0 10px;
   letter-spacing: -0.5px;
   line-height: 1.2;
@@ -342,7 +342,7 @@
 
 .home__hero-sub {
   font-size: 0.95rem;
-  color: #ffffff;
+  color: #343131;
   margin: 0 auto 28px;
   max-width: 460px;
   line-height: 1.55;
